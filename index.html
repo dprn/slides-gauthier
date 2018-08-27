@@ -1,0 +1,607 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>reveal.js</title>
+
+		<link rel="stylesheet" href="reveal.js/css/reveal.css">
+		<!-- <link rel="stylesheet" href="reveal.js/css/theme/black.css"> -->
+		<link rel="stylesheet" href="reveal.js/css/theme/sky-orig.css" id="theme">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="reveal.js/lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'reveal.js/css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+<!-- 		<script src="../MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+ -->
+ 		<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML' async></script>	
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+<section>
+    <h1 class="title">Reconstruction and pattern recognition via the Citti-Petitot-Sarti model</h1>
+    <h2 class="author">J.P. Gauthier, D. Prandi, U. Boscain <br></h2>
+    <h2 class="author">LSIS, Université de Toulon</h2><!--  &amp; École Polytechnique, Paris</h2> -->
+    <h2 class="author"><!-- Joint work with U. Boscain and M. Seri --></h2>
+<!--     <h3 class="date"><em>Séminaire “Statistique et imagerie”</em>  <br> 19 january 2014</h3>
+ -->
+</section>
+
+<section id="TOC">
+<h1 style="text-align:left">Outline of the talk:</h1>
+<ol>
+<li><a href="#/the-citti-petitot-sarti-model-of-the-primary-visual-cortex">The Citti-Petitot-Sarti model of the primary visual cortex </li>
+<li><a href="#/image-inpainting">Image Inpainting </li>
+<li><a href="#/image-recognition">Image recognition</a></li>
+</ol>
+</section> 
+
+<section><section id="the-citti-petitot-sarti-model-of-the-primary-visual-cortex" class="titleslide slide level1"><h1>The Citti-Petitot-Sarti model <br> of the primary visual cortex <img src="./graphics/V1.jpg" /></h1></section><section id="the-mathematical-model" class="slide level2">
+<h1>The mathematical model</h1>
+<h4 id="origin-of-the-model">Origin of the model:</h4>
+<ul>
+<li><em>Hoffman</em> (1989): structure of a contact manifold</li>
+<li><em>Petitot</em> (1999): structure of a sub-Riemannian manifold (Heisenberg group)</li>
+</ul>
+<h4 id="then-refined-by">then refined by:</h4>
+<ul>
+<li><em>Citti, Sarti</em> (2006): structure of the rototranslations of the plane <span class="math">\(SE(2)\)</span></li>
+<li><em>Agrachev, Boscain, Charlot, Gauthier, Rossi, D.P.</em> (2010—)</li>
+</ul>
+<h4 id="also-studied-by">Also studied by:</h4>
+<ul>
+<li><em>Sachkov</em> (2010-)</li>
+<li><em>Duits</em> (2009–)</li>
+</ul>
+</section><section id="neurophysiological-fact" class="slide level2">
+<h1>Neurophysiological fact</h1>
+<h3 id="structure-of-the-primary-visual-cortex">Structure of the primary visual cortex</h3>
+<p><em>Hubel and Wiesel</em> (Nobel prize 1981) observed that in the primary visual cortex V1, groups of neurons are sensitive to both positions and directions.</p>
+<figure>
+<img src="./graphics/pinwheels.jpg" alt="Patterns of orientation columns and long-range horizontal connections in V1 of a tree shrew. Taken from Kaschube et al. (2008)." /><figcaption>Patterns of orientation columns and long-range horizontal connections in V1 of a tree shrew. Taken from Kaschube <em>et al.</em> (2008).</figcaption>
+</figure>
+</section><section id="citti-petitot-sarti-model" class="slide level2">
+<h1>Citti-Petitot-Sarti model</h1>
+<p>V1 is modeled as the projective tangent bundle: <span class="math">\[
+    PT\mathbb R^2 = \mathbb R^2\times P^1
+\]</span></p>
+<figure>
+<img src="./graphics/hypercolumns.jpg" />
+</figure>
+</section><section id="section" class="slide level2">
+<h1></h1>
+<p>We need to discuss</p>
+<h4 id="receptive-fields">Receptive fields:</h4>
+<p>How a greyscale visual stimulus <span class="math">\(f:\mathbb R^2\to [0,1]\)</span> is lifted to an state on <span class="math">\(V1\)</span>.</p>
+<h4 id="spontaneous-evolution">Spontaneous evolution:</h4>
+<p>How a state on <span class="math">\(V1\)</span> evolves via neuronal connections.</p>
+</section><section id="receptive-fields-1" class="slide level2">
+<h1>Receptive fields</h1>
+<p>Receptive fields are aimed to describe a family of neurons <span class="math">\(\xi=(x,y,\theta)\)</span> in <span class="math">\(V1\cong PT\mathbb R^2\)</span> with a family of functions <span class="math">\(\{\Psi_\xi\}_\xi\)</span> on the image plane.</p>
+<ul>
+<li><p>It is widely accepted that a greyscale visual stimulus <span class="math">\(f:\mathbb R^2\to [0,1]\)</span> feeds a V1 neuron <span class="math">\(\xi\)</span> with an extracellular voltage <span class="math">\(f\mapsto Lf(\xi)\)</span> given by <span class="math">\[
+  Lf(\xi) = \langle f, \Psi_\xi \rangle_{L^2(\mathbb R^2)}.
+\]</span></p></li>
+<li><p>A good fit for <span class="math">\(\Psi_\xi\)</span> is the Gabor filter (sinusoidal wave multiplied by Gaussian function) centered at <span class="math">\((x,y)\)</span> of orientation <span class="math">\(\theta\)</span></p></li>
+</ul>
+<figure>
+<img src="./graphics/gabor.jpg" /> <img src="./graphics/gabor-ocr.png" />
+</figure>
+</section><section id="group-theoretical-approach" class="slide level2">
+<h1>Group theoretical approach</h1>
+<p>Consider <span class="math">\(SE(2) = \mathbb R^2\rtimes \mathbb S^1\)</span> with group operation <span class="math">\[
+  (x,\alpha)(y,\beta) = (x+R_\beta y,\alpha+\beta),
+\]</span> where <span class="math">\(R_\alpha\)</span> is the rotation of <span class="math">\(\alpha\)</span>.</p>
+<ul>
+<li><span class="math">\(SE(2)\)</span> is the double covering of <span class="math">\(PT\mathbb R^2\)</span>, so with appropriate care we can work here</li>
+<li>The left regular (unitary) representation <span class="math">\(\Lambda\)</span> of <span class="math">\(SE(2)\)</span> acting on <span class="math">\(\varphi\in L^2(SE(2))\)</span> is <span class="math">\[\Lambda(x,\alpha)\varphi(y,\beta) = \varphi((x,\alpha)^{-1}(y,\beta)) = \varphi(R_{-\alpha}(y-x),\beta-\alpha) \]</span></li>
+<li>The quasi-regular (unitary) representation <span class="math">\(\pi\)</span> of <span class="math">\(SE(2)\)</span> acting on <span class="math">\(L^2(\mathbb R^2)\)</span> is <span class="math">\[\pi(x,\alpha)f(y)=f(R_{-\alpha}(y-x))\]</span></li>
+</ul>
+</section><section id="section-1" class="slide level2">
+<h1></h1>
+<div class="boxed">
+<strong>Definition:</strong> A lift operator <span class="math">\(L:L^2(\mathbb R^2)\to L^2(SE(2))\)</span> is <em>left-invariant</em> if <span class="math">\[
+    \Lambda(a) Lf = L(\pi(a)f) \qquad\forall f\in L^2(\mathbb R^2), a\in SE(2).
+\]</span>
+</div>
+<div class="boxed">
+<strong>Theorem:</strong> (J.-P. Gauthier, D.P.) <br> Let <span class="math">\(L\)</span> be a left-invariant lift such that
+<ul>
+<li style="font-size:28.4px">
+<span class="math">\(L\)</span> is linear,
+</li>
+<li style="font-size:28.4px">
+<span class="math">\(f\mapsto Lf(0)\)</span> is densely defined and bounded.
+</li>
+</ul>
+Then, there exists <span class="math">\(\Psi\in L^2(\mathbb R^2)\)</span> such that <span class="math">\[
+    Lf(x,\theta) = \langle f,\pi(x,\theta)\Psi\rangle_{L^2(\mathbb R^2)} (= f\star R_{\theta}(-\bar{\Psi})) (x).
+\]</span> <!-- Moreover, in this case $L$ is injective if and only if
+$$
+    \int_{\mathbb S^1} |\hat\Psi(R_\theta \lambda)|^2\,d\theta >0 \text{ for a.e. }\lambda\in\widehat{\mathbb R^2}.
+$$
+ -->
+</div>
+<h4 id="remarks">Remarks</h4>
+<ul>
+<li>V1 receptive fields through Gabor filters define a left-invariant lift.</li>
+<li>The function <span class="math">\((x,k)\mapsto \langle f,\pi(x,k)\Psi\rangle_{L^2(\mathbb H)}\)</span> is known as the <strong>wavelet transform</strong> of <span class="math">\(f\)</span> w.r.t. <span class="math">\(\Psi\)</span>.</li>
+</ul>
+</section><section id="spontaneous-evolution-in-v1" class="slide level2">
+<h1>Spontaneous evolution in V1</h1>
+<p>Two types of connections between neurons:</p>
+<ul>
+<li><strong>Lateral connections</strong>: Between iso-oriented neurons, in the direction of their orientation. Represented by the integral lines of the vector field <span class="math">\[X_1(x,y,\theta) = \cos\theta\partial_x + \sin\theta\partial_y.\]</span></li>
+<li><strong>Local connections</strong>: Between neurons in the same hypercolumn. Represented by the integral lines of the vector field <span class="math">\[X_2(x,y,\theta) = \partial_\theta.\]</span></li>
+</ul>
+<figure>
+<img src="./graphics/lateral-connections.jpg" alt="Connections made by V1 cells of a tree shew. Picture from Bosking et al. (1997)" /><figcaption>Connections made by V1 cells of a tree shew. Picture from Bosking <em>et al.</em> (1997)</figcaption>
+</figure>
+<!-- ## 
+
+#### Lateral connections
+
+Between iso-oriented neurons, in the direction of their orientation.
+
+Represented by the integral lines of the vector field 
+$$
+    X_1(x,y,\theta) = \cos\theta\partial_x + \sin\theta\partial_y.
+$$
+
+#### Local connections
+
+Between neurons in the same hypercolumn.
+
+Represented by the integral lines of the vector field 
+$$
+    X_2(x,y,\theta) = \partial_\theta.
+$$ -->
+</section><section id="evolution-in-the-citti-petitot-sarti-model" class="slide level2">
+<h1>Evolution in the <br> Citti-Petitot-Sarti model</h1>
+<p>Given two independent Wiener process <span class="math">\(W\)</span> and <span class="math">\(Y\)</span> on <span class="math">\(PT\mathbb R^2\)</span>, neuron excitation evolve according to the SDE <span class="math">\[
+    dA_t = X_1 dW_t + X_2 dY_t
+\]</span></p>
+<p>Its generator <span class="math">\(\mathcal L = (\cos\theta\partial_x + \sin\theta\partial_y)^2+\partial_\theta^2\)</span> yields to the hypoelliptic equation for the evolution of a stimulus <span class="math">\(\Psi\in L^2(PT\mathbb R^2)\)</span>: <span class="math">\[
+    \frac d {dt} \Psi = \mathcal L \Psi.
+\]</span></p>
+<div class="fragment">
+<ul>
+<li>Highly anisotropic evolution</li>
+<li>Natural sub-Riemannian interpretation</li>
+<li>Invariant under the action of <span class="math">\(SE(2)\)</span></li>
+</ul>
+</div>
+</section><section id="semi-discrete-model" class="slide level2">
+<h1>Semi-discrete model</h1>
+<p><strong>Conjecture:</strong> The visual cortex can detect a finite (small) number of directions only (<span class="math">\(\approx\)</span> 30).</p>
+<p>This suggests to replace <span class="math">\(SE(2)\)</span> with <span class="math">\(SE(2,N)=\mathbb R^2\times \mathbb Z_N\)</span> and <span class="math">\(PT\mathbb R^2\)</span> with <span class="math">\(\mathbb R^2\times \mathbb Z_{N/2}\)</span>.</p>
+<h4 id="local-connections">Local connections</h4>
+<p>We replace <span class="math">\(\partial_\theta dY_t\)</span> by the jump Markov process <span class="math">\(\Theta_t\)</span> on <span class="math">\(\mathbb Z_N\)</span> defined as follows.</p>
+<ul>
+<li>The time of the first jump is exponentially distributed, with probability <span class="math">\(\frac 1 2\)</span> on either side.</li>
+<li>We obtain a Poisson process with <span class="math">\[P(k\text{ jumps in }[0,t]) = \frac {(\beta t)^k}{k!} e^{-\beta t}\]</span></li>
+</ul>
+<p>The infinitesimal generator is <span class="math">\(\Lambda_N\)</span></p>
+</section><section id="section-2" class="slide level2">
+<h1></h1>
+<h4 id="the-evolution-operator">The evolution operator</h4>
+<p>The semi-discrete evolution operator, acting on <span class="math">\(\Psi=(\Psi_r)_ r \in L^2(\mathbb R^2\times \mathbb Z_N)\)</span> is then <span class="math">\[
+    \mathcal L_N (z,r) = (A\Psi)_r (z) + (\Lambda _N\Psi(z)) _r,
+\]</span> where, for <span class="math">\(\theta_r=\pi r/N\)</span>, <span class="math">\[
+    (A\Psi)_r (z) = \frac 1 2\left( \cos(\theta _r)\partial _x + \sin(\theta _r)\partial _y \right)\Psi _r(z),
+\]</span> <span class="math">\[
+    (\Lambda_N \Psi(z))_r = \frac \beta 2 \left( \Psi _{r-1}(z)-2\Psi _r(z) + \Psi _{r+1}(z) \right).
+\]</span></p>
+<h4 id="advantages">Advantages</h4>
+<ul>
+<li>Already naturally discretized the <span class="math">\(\theta\)</span> variable.</li>
+<li>Invariant w.r.t. semi-discretized rototranslations <span class="math">\(SE(2,N)\)</span>.</li>
+</ul>
+</section></section>
+<section><section id="image-inpainting" class="titleslide slide level1"><h1>Image Inpainting <br> <img src="./graphics/botticelli.png" /></h1></section><section id="illusory-contours" class="slide level2">
+<h1>Illusory contours</h1>
+<figure>
+<img src="./graphics/kanizsa.jpg" alt="Kanizsa triangle" /> <img src="./graphics/kanizsa-2.png" alt="Kanizsa" />
+<figcaption>
+Two illusory contours
+</figcaption>
+</figure>
+<div class="fragment">
+<div class="boxed">
+<strong>Neurophysiological assumption:</strong> We reconstruct images through the natural diffusion in V1, which minimizes the energy required to activate unexcitated neurons.
+</div>
+</div>
+</section><section id="anthropomorphic-image-reconstruction" class="slide level2">
+<h1>Anthropomorphic image reconstruction</h1>
+<p>Let <span class="math">\(f\in L^2(\mathbb R^2)\)</span> with <span class="math">\(f\equiv 0\)</span> on <span class="math">\(\Omega\subset \mathbb R^2\)</span> be an image corrupted on <span class="math">\(\Omega\)</span>.</p>
+<ol start="0" type="1">
+<li>Smooth <span class="math">\(f\)</span> by a Gaussian filter to get generically a Morse function</li>
+<li>Lift <span class="math">\(f\)</span> to <span class="math">\(Lf\)</span> on <span class="math">\(\mathbb R^2\times \mathbb Z_N\)</span></li>
+<li>Evolve <span class="math">\(Lf\)</span> through the CPS semi-discrete evolution</li>
+<li>Project the evolved <span class="math">\(Lf\)</span> back to <span class="math">\(\mathbb R^2\)</span></li>
+</ol>
+<h5 id="remarks-1">Remarks</h5>
+<ul>
+<li>Reasonable results for small corruptions</li>
+<li>Adding some heuristic procedures yield very good reconstructions</li>
+</ul>
+</section><section id="smoothing" class="slide level2">
+<h1>Smoothing</h1>
+<p>Even if images are not described by Morse functions, the retina smooths images through a Gaussian filter (Peichl &amp; Wässle (1979), Marr &amp; Hildreth (1980))</p>
+<div class="boxed">
+<strong>Theorem</strong> (Boscain, Duplex, Gauthier, Rossi 2012) <br> The convolution of <span class="math">\(f\in L^2(\mathbb R^2)\)</span> with a two dimensional Gaussian centered at the origin is generically a Morse function.
+</div>
+<figure>
+<img src="./graphics/morse.png" alt="Level lines of Morse functions" /><figcaption>Level lines of Morse functions</figcaption>
+</figure>
+</section><section id="simple-lift" class="slide level2">
+<h1>Simple Lift</h1>
+<p>For simplicity, instead than the lift through Gabor filters we chose to lift <span class="math">\(f(x,y)\)</span> to <span class="math">\[
+    Lf(x,y,r) = 
+    \begin{cases} 
+       f(x,y) &amp; \text{ if }  (\nabla f(x,y), (\cos\theta_r,\sin\theta_r))\cong 0\\
+       0 &amp; \text{ otherwise}
+    \end{cases}
+\]</span></p>
+<figure>
+<img src="./graphics/simple-lift.jpg" />
+</figure>
+</section><section id="example-lifting-a-curve" class="slide level2">
+<h1>Example: lifting a curve</h1>
+<p>In the continuous model a curve <span class="math">\(t\mapsto (x(t),y(t))\)</span> in <span class="math">\(\mathbb R^2\)</span> is lifted to <span class="math">\(t\mapsto (x(t),y(t),\theta(t))\)</span> curve in <span class="math">\(PT\mathbb R^2\)</span>, where <span class="math">\[\theta(t) = \arctan\left( \frac{\dot x(t)}{\dot y(t)}\right).\]</span></p>
+<figure>
+<img src="./graphics/curve-lift.png" alt="The lift of t\mapsto (\cos(t),\sin(t))" /><figcaption>The lift of <span class="math">\(t\mapsto (\cos(t),\sin(t))\)</span></figcaption>
+</figure>
+</section><section id="a-remarkable-feature" class="slide level2">
+<h1>A remarkable feature</h1>
+<p>When <span class="math">\(f\)</span> is a Morse function, the lift Lf is supported on a 2D manifold. (This is false if the angles are not projectivized!)</p>
+<figure>
+<img src="./graphics/morse-lift.png" />
+</figure>
+</section><section id="semi-discrete-evolution" class="slide level2">
+<h1>Semi-discrete evolution</h1>
+<p>The hypoelliptic heat kernel of the semi-discretized operator <span class="math">\(\mathcal L_N\)</span> has been explicitly computed, but is impractical from the numerical point of view.</p>
+<p>We use the following scheme:</p>
+<ol type="1">
+<li>For any <span class="math">\(r\in\mathbb Z_N\)</span> compute <span class="math">\(\widehat{Lf_r}(k)\)</span>, the Fourier transform of <span class="math">\(Lf(\cdot,\cdot,r)\)</span>.</li>
+<li>For any <span class="math">\(k=(\lambda\cos\alpha,\lambda\sin\alpha)\)</span> we let <span class="math">\(U_k(r)\)</span> be the solution of the decoupled ODE on <span class="math">\(\mathbb Z_N\)</span> <span class="math">\[ \begin{cases} \frac{d}{dt}U_k = \Lambda_N U_k - \text{diag}\left( \lambda^2 \cos(\theta_r-\alpha)\right)U_k \\ U_k(r)| _ {t=0}=\widehat{Lf _ r}(k). \end{cases} \]</span></li>
+<li>For any <span class="math">\(r\in\mathbb Z_N\)</span> the solution <span class="math">\(\Psi_r(x,y)\)</span> is the inverse Fourier transform of <span class="math">\(k\mapsto U_r(k)\)</span></li>
+</ol>
+<p><br></p>
+<p>This scheme can be implemented by discretizing <span class="math">\(\mathbb R^2\)</span>.</p>
+</section><section id="a-view-through-almost-periodic-functions" class="slide level2">
+<h1>A view through almost-periodic functions</h1>
+<p>To avoid discretizing <span class="math">\(\mathbb R^2\)</span> we can proceed as follows: <!-- In relation with what follows (for pattern recognition), there is a different point of view, which yields a better evolution. --> Let <span class="math">\(\Sigma\subset\mathbb R^2\)</span> be the grid of pixels of the image and <span class="math">\(f_d:\Sigma\to [0,1]\)</span> be the pixel values.</p>
+<ol type="1">
+<li>Compute <span class="math">\(\hat f_d:\widehat\Sigma\to \mathbb C\)</span>, the discrete Fourier transform (FFT) of <span class="math">\(f_d\)</span> on <span class="math">\(\Sigma\)</span></li>
+<li>Represent <span class="math">\(f_d\)</span> as the almost-periodic function <span class="math">\[f_{\text{AP}}(x) = \sum_{k\in \widehat\Sigma} \hat f_d(k)e^{i\langle z, k\rangle}. \]</span></li>
+<li>Evolve <span class="math">\(f\)</span> splitting the evolution in the ODE’s, for each <span class="math">\(k=(\lambda,\mu)\in\widehat\Sigma\)</span>, <span class="math">\[ \begin{cases} \frac{d}{dt}U_k = \Lambda_N U_k - 2\pi^2 \text{diag}\left( \lambda \cos\theta_r+\mu \sin\theta_r\right)U_k \\ U_k(r)| _ {t=0}=\hat f_d(k). \end{cases} \]</span></li>
+</ol>
+<p><br></p>
+<p>The evolution of <span class="math">\(f_{\text{AP}}\)</span> is <strong>exact</strong>!</p>
+</section><section id="projection" class="slide level2">
+<h1>Projection</h1>
+<p>Given the result of the evolution <span class="math">\((\Psi_r)_r\)</span>, we define the reconstructed image by</p>
+<p><span class="math">\[
+    \tilde f(x,y) = \max_{r\in\mathbb Z_N} \Psi_r(x,y).
+\]</span></p>
+</section><section id="results" class="slide level2">
+<h1>Results</h1>
+<figure>
+<img src="./graphics/CPS-results.png" alt="Inpainting results from Boscain et al. (2014)" /><figcaption>Inpainting results from Boscain <em>et al.</em> (2014)</figcaption>
+</figure>
+</section><section id="mumford-elastica-model" class="slide level2">
+<h1>Mumford Elastica Model</h1>
+<p>With the same techniques it is possible to treat the evolution equation underlying the Mumford Elastica model, which is associated with the operator <span class="math">\[
+  \mathcal L_M = X_1+X_2^2 = \cos\theta\partial_x + \sin\theta\partial_y +\partial_\theta^2
+\]</span></p>
+<figure>
+<img src="./graphics/corrupted.png" alt="Corrupted image" /> <img src="./graphics/petitot-ap.png" alt="Image reconstructed through the CPS evolution" /> <img src="./graphics/mumford-ap.png" alt="Image reconstructed through the Mumford evolution" /><br />
+<figcaption>
+Comparison of a reconstruction with the Petitot diffusion and the Mumfor diffusion from Boscain, Gauthier, P., Remizov (2014)
+</figcaption>
+</figure>
+</section><section id="highly-corrupted-images-reconstruction" class="slide level2">
+<h1>Highly corrupted images reconstruction</h1>
+<p>Based upon this diffusion and certain heuristic complements, we get nice results on images with more than 85% of pixels missing.</p>
+<figure>
+<img src="./graphics/armstrong000__.png" /> <img src="./graphics/bellucci000__.png" /> <br> <img src="./graphics/dog000__.png" /> <img src="./graphics/eye000__.png" /> <br> <img src="./graphics/jpg000__.png" /> <img src="./graphics/minelli000__.png" />
+<figcaption>
+Image from Boscain, Gauthier, P., Remizov (<em>preprint</em>)
+</figcaption>
+</figure>
+</section></section>
+<section><section id="image-recognition" class="titleslide slide level1"><h1>Image recognition</h1></section><section id="spectral-invariants" class="slide level2">
+<h1>Spectral invariants</h1>
+<!-- #### Objective -->
+<p>Given a group <span class="math">\(\mathbb G\)</span> and a representation <span class="math">\(\Phi\)</span> of <span class="math">\(\mathbb G\)</span> on some topological space <span class="math">\(X\)</span>, a <strong>complete set of invariants</strong> is a map <span class="math">\(f\mapsto I_f\)</span>, from <span class="math">\(X\)</span> to some functional space <span class="math">\(\mathcal B\)</span> such that <span class="math">\[ I_f=I_g \iff \exists a\in\mathbb G \text{ s.t. } f= \Phi(a)g. \]</span> If the above holds only for <span class="math">\(f\)</span> and <span class="math">\(g\)</span> in some residual subset of <span class="math">\(X\)</span>, the <span class="math">\(I_f\)</span>’s are said to be a <strong>weakly complete set of invariants</strong>.</p>
+<p>We speak of <strong>spectral invariants</strong> whenever the <span class="math">\(I_f\)</span>’s depend on the Fourier transform of <span class="math">\(f\)</span>.</p>
+<h4 id="important-cases">Important cases</h4>
+<ol type="1">
+<li>Since any group acts on itself, we look for invariants for the action of the left regular representation <span class="math">\(\Lambda\)</span> of <span class="math">\(\mathbb G\)</span> on <span class="math">\(X=L^2(\mathbb G)\)</span></li>
+<li>Given a semidirect product <span class="math">\(\mathbb G = \mathbb H\rtimes \mathbb K\)</span>, we look for invariants for the quasi-regular representation <span class="math">\(\pi\)</span> of <span class="math">\(\mathbb G\)</span> on <span class="math">\(X=L^2(\mathbb H)\)</span>.</li>
+</ol>
+</section><section id="plan" class="slide level2">
+<h1>Plan</h1>
+<ol type="1">
+<li>Case of an abelian group (e.g. invariants on <span class="math">\(\mathbb R^n\)</span> w.r.t. translations)
+<ul>
+<li>Fourier transform and Pontryagin duality</li>
+<li>Bispectral invariants</li>
+</ul></li>
+<li>Case of <span class="math">\(SE(2,N)\)</span> (non-compact, non-abelian semi-direct product)
+<ul>
+<li>Generalized Fourier transform and Chu duality</li>
+<li>Bispectral invariants for <span class="math">\(L^2(SE(2,N))\)</span></li>
+<li>Invariants for lifts of functions in <span class="math">\(L^2(\mathbb R^2)\)</span> w.r.t. semidiscretized roto-translations.</li>
+</ul></li>
+</ol>
+</section><section id="fourier-transform-on-abelian-groups" class="slide level2">
+<h1>Fourier transform on abelian groups</h1>
+<p>Let <span class="math">\(\mathbb G\)</span> be a locally compact abelian group with Haar measure <span class="math">\(d\mu\)</span>.</p>
+<p>The <strong>dual</strong> <span class="math">\(\widehat{\mathbb G}\)</span> of <span class="math">\(\mathbb G\)</span> is the set of of characters of <span class="math">\(\mathbb G\)</span>, i.e., of continuous group homomorphism <span class="math">\(\lambda:\mathbb G\to \mathbb C\)</span>, <span class="math">\(|\lambda(\cdot)|=1\)</span>.</p>
+<p>The <strong>Fourier transform</strong> of <span class="math">\(f\in L^1(\mathbb G)\cap L^2(\mathbb G)\)</span> is the map on <span class="math">\(\widehat{\mathbb G}\)</span> defined by <span class="math">\[
+    \hat f(\lambda)= \int_{\mathbb G} f(a) \, \bar\lambda(a)\,d\mu(a).
+\]</span></p>
+<p>Since <span class="math">\(\widehat{\mathbb G}\)</span> is abelian and locally compact, the Fourier transform extends to an isometry <span class="math">\(\mathcal F:L^2(\mathbb G) \to L^2(\widehat{\mathbb G})\)</span> w.r.t. the Haar measure on <span class="math">\(\widehat{\mathbb G}\)</span>.</p>
+<p><strong>Fundamental property:</strong> For any <span class="math">\(a\in\mathbb G\)</span>, <span class="math">\[
+  f= \Lambda(a) g \iff \hat f(\lambda) = \lambda(a)\hat g(\lambda) \quad\forall\lambda\in\widehat{\mathbb G}.
+\]</span></p>
+</section><section id="example-mathbb-r" class="slide level2">
+<h1>Example: <span class="math">\(\mathbb R\)</span></h1>
+<p>It holds <span class="math">\(\widehat {\mathbb R} \cong \mathbb R\)</span>, where for <span class="math">\(\lambda\in\mathbb R\)</span> the corresponding element of <span class="math">\(\widehat {\mathbb R}\)</span> is <span class="math">\(\hat \lambda(x):= e^{i\lambda x}\)</span>. The above defined Fourier transform then reduces to <span class="math">\[\hat f(\lambda) = \int_{\mathbb R} f(x) e^{-i \lambda x}\, dx \]</span> Then, <span class="math">\[f(y) = g(y-x) \quad\forall y\in\mathbb R \iff  \hat f(\lambda) = e^{i\lambda x}\hat g(\lambda) \quad\forall\lambda\in{\mathbb R} \]</span></p>
+<h4 id="remark">Remark</h4>
+<p>In this case, it is clear that <span class="math">\(\widehat{\mathbb R}\)</span> is indeed a group and that <span class="math">\(\widehat {\widehat {\mathbb R}}\cong\mathbb R\)</span>. This is an instance of <strong>Pontryagin duality</strong>, which works on all <em>abelian</em> groups:</p>
+<div class="boxed">
+<strong>Theorem:</strong> (Pontryagin duality) The dual of <span class="math">\(\widehat{\mathbb G}\)</span> is canonically isomorphic to <span class="math">\(\mathbb G\)</span>. More precisely, <span class="math">\(\Omega:\mathbb G\to \widehat{\widehat{\mathbb G}}\)</span> defined as <span class="math">\(\Omega(a)(\lambda) = \lambda(a)\)</span> is a group isomorphism.
+</div>
+<!-- - Other instances are, for example, $\widehat{\mathbb S^1} \cong \mathbb Z$  and $\widehat{\mathbb Z} \cong \mathbb S^1$. -->
+</section><section id="invariants-for-abelian-groups" class="slide level2">
+<h1>Invariants for abelian groups</h1>
+<p>Let <span class="math">\(\mathbb G\)</span> be a locally compact abelian group and consider the action on <span class="math">\(L^2(\mathbb G)\)</span> of the left-regular representation (e.g. for <span class="math">\(\mathbb G = \mathbb R\)</span> this corresponds to translations).</p>
+<p>The <strong>power spectrum invariants</strong> for <span class="math">\(f\in L^2(\mathbb G)\)</span> w.r.t. the action of the left regular representation are the functions <span class="math">\[\lambda\in\widehat{\mathbb G} \mapsto I_f(\lambda)=|\hat f(\lambda)|^2.\]</span></p>
+<p>These are widely used (e.g. in astronomy), but are not complete:</p>
+<ul>
+<li>Fix any <span class="math">\(\varphi: \widehat{\mathbb G} \to \mathbb C\)</span> s.t. <span class="math">\(|\varphi(\lambda)|=1\)</span> which is <em>not</em> a character of <span class="math">\(\widehat{\mathbb G}\)</span>,</li>
+<li>Let <span class="math">\(g = \mathcal F^{-1}( \varphi \hat f )\)</span>, so that <span class="math">\(I_f=I_g\)</span>,</li>
+<li>However, <span class="math">\(f\neq\Lambda(a)g\)</span> for any <span class="math">\(a\in\mathbb G\)</span>, since <span class="math">\[f= \Lambda(a)g \iff \hat f(\lambda) = \lambda(a)\hat g(a). \]</span> Indeed, if it was the case <span class="math">\(\varphi(\lambda) = \lambda(a)\)</span> which, by Pontryagin duality, is equivalent to <span class="math">\(\varphi\)</span> being a character of <span class="math">\(\widehat{\mathbb G}\)</span>.</li>
+</ul>
+</section><section id="section-3" class="slide level2">
+<h1></h1>
+<p>What is missing in the power spectrum invariants is the phase information.</p>
+<p>The <strong>bispectral invariants</strong> for <span class="math">\(f\in L^2(\mathbb G)\)</span> w.r.t. the action of the left regular representation are the functions <span class="math">\[(\lambda_1,\lambda_2)\in\widehat{\mathbb G} \mapsto B_f(\lambda_1,\lambda_2)={\hat f(\lambda_1+\lambda_2)}\,\overline{\hat f(\lambda_1)}\, \overline{\hat f(\lambda_2)}.\]</span></p>
+<div class="boxed">
+<strong>Theorem:</strong> The bispectral invariants are weakly complete on <span class="math">\(L^2(K)\subset L^2(\mathbb G)\)</span>, where <span class="math">\(K\subset \mathbb G\)</span> is compact. In particular, they discriminate on the residual set <span class="math">\(\mathcal G\subset L^2(\mathbb G)\)</span> of those square-integrable <span class="math">\(f\)</span>’s such that <span class="math">\(\hat f(\lambda)\neq 0\)</span> on an open-dense subset of <span class="math">\(\widehat{\mathbb G}\)</span>.
+</div>
+<h4 id="remarks-2">Remarks</h4>
+<ul>
+<li>Note that <span class="math">\(\lambda\mapsto \frac{B(\lambda,0)}{\hat f(0)}\)</span> allows to recover the power spectral invariants</li>
+<li>The bispectral invariants are used in several areas of signal processing (e.g. to identify music timbre and texture, Dubnov <em>et al.</em> (1997))</li>
+</ul>
+</section><section id="proof-of-weak-completeness" class="slide level2">
+<h1>Proof of weak completeness</h1>
+<p>Let <span class="math">\(f,g\in \mathcal G\)</span> be compactly supported and such that <span class="math">\(I_f=I_g\)</span>.</p>
+<ul>
+<li>Define <span class="math">\(u(\lambda) = \hat g(\lambda)/\hat f(\lambda)\)</span>, which is a continuous function on an open and dense set of <span class="math">\(\mathbb G\)</span> satisfying <span class="math">\(|u(\cdot)|\equiv 1\)</span>.</li>
+<li>Since the bispectral invariants coincide it holds <span class="math">\[u(\lambda_1+\lambda_2) = u(\lambda_1)u(\lambda_2).\]</span></li>
+<li>Since <span class="math">\(f,g\)</span> are compactly supported, <span class="math">\(\hat f\)</span> and <span class="math">\(\hat g\)</span> are continuous and hence <span class="math">\(u\)</span> can be extended to a measurable function on <span class="math">\(\widehat{\mathbb G}\)</span>, still satisfying the above.</li>
+<li>Since every measurable character is continuous, this shows that <span class="math">\(u\in\widehat{\widehat{\mathbb G}} \cong \mathbb G\)</span>. That is, there exists <span class="math">\(a\in \mathbb G\)</span> such that <span class="math">\(u(\lambda)=\lambda(a)\)</span>, and hence <span class="math">\[\hat f(\lambda) = \lambda(a)\hat g(\lambda) \iff f = \Lambda(a)g.\]</span></li>
+</ul>
+</section><section id="generalized-fourier-transform" class="slide level2">
+<h1>Generalized Fourier transform</h1>
+<p>Let <span class="math">\(\mathbb G\)</span> is a locally compact unimodular group with Haar measure <span class="math">\(d\mu\)</span> not necessarily abelian.</p>
+<p>The <strong>dual</strong> <span class="math">\(\widehat{\mathbb G}\)</span> of <span class="math">\(\mathbb G\)</span> is the set of equivalence classes of unitary irreducible representations of <span class="math">\(\mathbb G\)</span>.</p>
+<p>The <strong>(generalized) Fourier transform</strong> of <span class="math">\(f\in L^1(\mathbb G)\cap L^2(\mathbb G)\)</span> is the map that to <span class="math">\(R\in \widehat{\mathbb G}\)</span> acting on the Hilbert space <span class="math">\(\mathcal H_R\)</span> associates the Hilbert-Schmidt operator on <span class="math">\(\mathcal H_R\)</span> defined by <span class="math">\[
+    \hat f(R)= \int_{\mathbb G} f(a) \, R(a)^{-1}\,d\mu(a) \in HS(\mathcal H_R).
+\]</span></p>
+<p>There exists a measure <span class="math">\(d\hat\mu\)</span> (the <strong>Plancherel measure</strong>) on <span class="math">\(\widehat G\)</span> w.r.t. the Fourier transform can be extended to an isometry <span class="math">\(\mathcal F:L^2(\mathbb G) \to L^2(\widehat{\mathbb G})\)</span>.</p>
+<p><strong>Fundamental property:</strong> For any <span class="math">\(a\in\mathbb G\)</span>, <span class="math">\[
+  f= \Lambda(a) g \iff \hat g(R) = \hat f(R)\circ R(a) 
+\]</span></p>
+</section><section id="chu-duality" class="slide level2">
+<h1>Chu duality</h1>
+<p>Chu duality is an extension of the dualities of Pontryagin (for abelian groups) and Tannaka (for compact groups) to certain (non-compact) MAP groups. Here the difficulty is to find a suitable notion of bidual, carrying a group structure. See Heyer (1973).</p>
+<p>Let <span class="math">\(\mathbb G\)</span> be a topological group</p>
+<ul>
+<li><span class="math">\(\text{Rep}_n(\mathbb G)\)</span> is the set of all <span class="math">\(n\)</span>-dimensional continuous unitary representations <span class="math">\(R\)</span> of <span class="math">\(\mathbb G\)</span> in <span class="math">\(\mathbb C^n\)</span>. It is endowed with the compact-open topology.</li>
+<li>The <strong>Chu dual</strong> of <span class="math">\(\mathbb G\)</span> is the topological sum <span class="math">\[\text{Rep}(\mathbb G)=\bigcup_{n\succcurlyeq 1}\text{Rep}_ n(\mathbb G).\]</span></li>
+<li><span class="math">\(\text{Rep}(\mathbb G)\)</span> is second countable if <span class="math">\(\mathbb G\)</span> is so.</li>
+</ul>
+</section><section id="quasi-representations" class="slide level2">
+<h1>Quasi-representations</h1>
+<ul>
+<li><p>A <strong>quasi-representation</strong> of <span class="math">\(\mathbb G\)</span> is a continuous map <span class="math">\(Q\)</span> from <span class="math">\(\text{Rep}(\mathbb G)\)</span> to <span class="math">\(\bigcup_{n\succcurlyeq 1}\mathcal U(\mathbb C^n)\)</span> such that for any <span class="math">\(R,R&#39;\in \text{Rep}(\mathbb G)\)</span> and <span class="math">\(U\in\mathcal U(\mathbb C^{n(R)})\)</span></p>
+<ol type="1">
+<li><span class="math">\(Q(R)\in\mathcal U(\mathbb C^{n(R)})\)</span></li>
+<li><span class="math">\(Q(R\oplus R&#39;)=Q(R)\oplus Q(R&#39;)\)</span></li>
+<li><span class="math">\(Q(R\otimes R&#39;)=Q(R)\otimes Q(R&#39;)\)</span></li>
+<li><span class="math">\(Q(U^{-1}RU) = U^{-1}Q(R)U\)</span></li>
+</ol></li>
+<li>The <strong>Chu quasi-dual</strong> of <span class="math">\(\mathbb G\)</span> is the union <span class="math">\(\text{Rep} (\mathbb G)^{\vee}\)</span> of all quasi-representations of <span class="math">\(\mathbb G\)</span> endowed with the compact-open topology.</li>
+<li>Setting <span class="math">\(E(R)=\text{Id}_{n(R)}\)</span> and <span class="math">\(Q^{-1}(R)=Q(R^{-1})\)</span>, <span class="math">\(\text{Rep} (\mathbb G)^{\vee}\)</span> is a Hausdorff topological group with identity <span class="math">\(E\)</span>.</li>
+<li><p>The mapping <span class="math">\(\Omega:\mathbb G\to \text{Rep} (\mathbb G)^{\vee}\)</span> defined by <span class="math">\(\Omega(g)(R) = R(g)\)</span> is a continuous homomorphis, injective if the group is MAP.</p></li>
+</ul>
+<div class="boxed">
+<strong>Definition:</strong> The group <span class="math">\(\mathbb G\)</span> has the <strong>Chu duality property</strong> if <span class="math">\(\Omega\)</span> is a topological isomorphism.
+</div>
+</section><section id="chu-dual" class="slide level2">
+<h1>Chu dual</h1>
+<p>A Moore group is a group whose irreducible representations are all finite-dimensional.</p>
+<div class="boxed">
+<p><strong>Theorem</strong> (Chu)</p>
+The following inclusions hold <span class="math">\[
+\text{Moore groups} \subset \text{Groups with Chu duality} \subset \text{MAP groups}.
+\]</span>
+</div>
+<ul>
+<li>The group <span class="math">\(SE(2,N)\)</span> is Moore (i.e. all its irreducible representations are finite-dimensional) and then it has Chu duality.</li>
+<li>The group <span class="math">\(SE(2)\)</span> is not MAP (i.e. almost-periodic functions do not form a dense subspace of continuous functions) and hence it does not have Cuu duality.</li>
+</ul>
+<div class="boxed">
+This is why it is more convenient to work in the semi-discretized model
+</div>
+</section><section id="the-case-of-se2n" class="slide level2">
+<h1>The case of <span class="math">\(SE(2,N)\)</span></h1>
+<p>Let us consider the (non-compact, non-abelian) Moore group <span class="math">\(SE(2,N)=\mathbb R^2\rtimes \mathbb Z_N\)</span>.</p>
+<!-- The dual of $SE(2,N)$, via Mackey machinery, are divided in  -->
+<!-- the Plancherel measure is the Lebesgue measure on $\widehat{\mathbb R^2}\cong{\mathbb R^2}$$. -->
+<p>The unitary irreducible representations fall into two classes</p>
+<ul>
+<li><em>Characters:</em> Any <span class="math">\(\hat n\in\mathbb Z_N\)</span> induces the one-dimensional representation <span class="math">\(K_n(x,k) = \hat n(k)\)</span>.</li>
+<li><em><span class="math">\(N\)</span>-dimensional representations:</em> For any <span class="math">\(\lambda\in\widehat{\mathbb R^2}\setminus 0\)</span> we have the representation that acts on <span class="math">\(\mathbb C^N\)</span> as <span class="math">\[T^\lambda(x,k) = \text{diag }_ n \lambda(R_n x)\, S^k,\]</span> where <span class="math">\(S^k\)</span> is the shift operator <span class="math">\(S^k v(n) = v(n+k)\)</span>.</li>
+</ul>
+<p>Since the Plancherel measure is supported on the <span class="math">\(N\)</span>-dimensional representations, bispectral invariants are generalized to <span class="math">\(\varphi\in L^2(SE(2,N))\)</span> as the following functions of <span class="math">\(\lambda_1,\lambda_2\neq 0\)</span>: <span class="math">\[
+  B_\varphi(\lambda_1,\lambda_2) = \hat\varphi(T^{\lambda_1}\otimes T^{\lambda_2})\circ \hat\varphi(T^{\lambda_1})^* \otimes \hat\varphi(T^{\lambda_2})^*.
+\]</span></p>
+</section><section id="the-left-regular-representation" class="slide level2">
+<h1>The left regular representation</h1>
+<div class="boxed">
+<strong>Theorem:</strong> The bispectral invariants are weakly complete w.r.t. the action of <span class="math">\(\Lambda\)</span> on <span class="math">\(L^2(K)\subset L^2(SE(2,N))\)</span>, where <span class="math">\(K\subset SE(2,N)\)</span> is compact. In particular, they discriminate on the residual set <span class="math">\(\mathcal G\subset L^2(K)\)</span> of those square-integrable <span class="math">\(\varphi\)</span>’s such that <span class="math">\(\hat \varphi(T^\lambda)\)</span> is invertible for <span class="math">\(\lambda\)</span> in an open-dense subset of <span class="math">\(\widehat{\mathbb R^2}\setminus\{0\}\)</span>.
+</div>
+<p>The proof is similar to the abelian one: Given <span class="math">\(f,g\in\mathcal G\)</span> with <span class="math">\(B_{f}=B_g\)</span>:</p>
+<ul>
+<li>Let <span class="math">\(U(T^\lambda) = \hat f(T^\lambda)^{-1}\circ\hat g(T^\lambda)\)</span> for <span class="math">\(\lambda\neq0\)</span> s.t. <span class="math">\(\hat f(T^\lambda)\)</span> is invertible.</li>
+<li>Prove that <span class="math">\(U(T^\lambda)\)</span> can be extended to a quasi-representation</li>
+<li>Since <span class="math">\(SE(2,N)\)</span> is Moore, it has Chu duality and hence there exists <span class="math">\((x,k)\in SE(2,N)\)</span> s.t. <span class="math">\(U(T) = T(x,k)\)</span> for any unitary representation <span class="math">\(T\)</span></li>
+<li>Finally, this implies <span class="math">\[\hat f(T) \circ T(x,k) = \hat g(T) \iff \Lambda(x,k) f = g.\]</span></li>
+</ul>
+</section><section id="the-quasi-regular-representation" class="slide level2">
+<h1>The quasi-regular representation</h1>
+<p>Consider now the quasi-regular representation <span class="math">\(\pi\)</span> acting on <span class="math">\(L^2(\mathbb R^2)\)</span>, which corresponds to rotation and translations.</p>
+<p>Fixed a lift <span class="math">\(L:L^2(\mathbb R^2)\to L^2(SE(2,N))\)</span> we define the bispectral invariants <span class="math">\(B_f\)</span> as <span class="math">\(B_{Lf}\)</span>.</p>
+<div class="boxed">
+<strong>Corollary:</strong> Let <span class="math">\(L:L^2(\mathbb R^2)\to L^2(SE(2,N))\)</span> be an injective left-invariant lift. Then, for any compact <span class="math">\(K\subset \mathbb R^2\)</span> the bispectral invariants are complete for the action of <span class="math">\(\pi\)</span> on the subset <span class="math">\(\mathcal R\)</span> of <span class="math">\(f\in L^2(K)\)</span> such that <span class="math">\(\widehat {Lf}\)</span> is invertible for <span class="math">\(\lambda\)</span> in an open-dense subset of <span class="math">\(\widehat{\mathbb R^2}\setminus\{0\}\)</span>.
+</div>
+<p><strong>Proof:</strong></p>
+<p>Let <span class="math">\(f,g\in L^2(K)\)</span> be such that <span class="math">\(B_f=B_g\)</span>. Then <span class="math">\[
+  B_f=B_g \iff B_{Lf}=B_{Lg} \iff Lf=\Lambda(x,k)Lg \iff f=\pi(x,k)g.
+\]</span></p>
+</section><section id="section-4" class="slide level2">
+<h1></h1>
+<p>Unfortunately, the set <span class="math">\(\mathcal R\)</span> is empty for regular left-invariant lifts:</p>
+<ul>
+<li>Let <span class="math">\(\omega_f(\lambda)\in \mathbb C^N\)</span> be the vector <span class="math">\(\omega_f(\lambda)(k) = \hat f(R_{-k}\lambda)\)</span>.</li>
+<li>Since <span class="math">\(Lf(x,k) = \langle f,\pi(x,k) \Psi\rangle_{L^2(\mathbb R^2)}\)</span> we have <span class="math">\[
+  \widehat{Lf}(T^\lambda) = \overline{\omega_f(\lambda)}^*\otimes \overline{\omega_\Psi(\lambda)}.
+\]</span></li>
+<li>Thus <span class="math">\(\widehat{Lf}(T^\lambda)\)</span> has at most rank <span class="math">\(1\)</span> and hence <span class="math">\(\mathcal R=\varnothing\)</span>.</li>
+</ul>
+<div class="fragment">
+<div class="boxed">
+<strong>Conjecture:</strong> The bispectral invariants are weakly complete w.r.t. the action of <span class="math">\(\pi\)</span> on compactly supported functions of <span class="math">\(L^2(\mathbb R^2)\)</span>.
+</div>
+</div>
+<div class="fragment">
+<h4 id="remark-1">Remark</h4>
+<ul>
+<li>There exists non left-invariant lifts for which <span class="math">\(\mathcal R\)</span> is residual, as the <strong>cyclic lift</strong> <span class="math">\[L_cf(x,k) = f(R_k x + \text{cent } f).\]</span></li>
+<li>The price to pay is that we have to quotient away the translations before the lift. This suggest the following.</li>
+</ul>
+</div>
+</section><section id="rotational-bispectral-invariants" class="slide level2">
+<h1>Rotational bispectral invariants</h1>
+<p>The <strong>rotational bispectral invariants</strong> for <span class="math">\(f\in L^2(\mathbb R^2)\)</span> are, for any <span class="math">\(\lambda_1,\lambda_2\neq 0\)</span> and any <span class="math">\(k\in\mathbb Z_N\)</span> the quantities <span class="math">\[
+  B_f(\lambda_1,\lambda_2,k) = \widehat{Lf}(T^{\lambda_1}\otimes T^{\lambda_2})\circ \widehat{Lf}(T^{\lambda_1})^* \otimes \widehat{Lf}(T^{R_k \lambda_2})^*.
+\]</span> Observe that <span class="math">\(B_f\)</span> is invariant under rotations but not under translations.</p>
+<p>A function <span class="math">\(f\in L^2(\mathbb R^2)\)</span> is <strong>weakly cyclic</strong> if <span class="math">\(\{S^n \omega_f(\lambda)\}_{n\in\mathbb Z _N}\)</span> is a basis of <span class="math">\(\mathbb C^N\)</span> for a.e. <span class="math">\(\lambda\)</span>.</p>
+<p>Modifying the arguments used in the case of the left-regular representation, we can then prove the following.</p>
+<div class="boxed">
+<strong>Theorem:</strong> Consider a regular left-invariant lift with <span class="math">\(\Psi\)</span> weakly cyclic and such that <span class="math">\(\hat\Psi(\lambda)\neq 0\)</span> a.e.. Then, the rotational bispectral invariants are weakly complete w.r.t. the action of rotations on <span class="math">\(L^2(K)\)</span> for any <span class="math">\(K\subset \mathbb R^2\)</span>. More precisely, they discriminate on weakly cyclic functions.
+</div>
+</section><section id="experimental-results" class="slide level2">
+<h1>Experimental results</h1>
+<p>In Smach <em>et al.</em> (2008), although the theory was not complete, some tests on standard academic databases have been carried out. They yielded results superior to standard strategies.</p>
+<ul>
+<li>ZM denotes the standard Zernike moments</li>
+<li><span class="math">\(1^{\text{st}}\)</span> MD are the (non-complete) power spectrum invariants <span class="math">\(I_f(\lambda) = \widehat{Lf}(T^\lambda)\circ \widehat{Lf}(T^\lambda)^*\)</span></li>
+<li><span class="math">\(2^{\text{nd}}\)</span> MD are the bispectral invariants</li>
+</ul>
+<figure>
+<img src="./graphics/coil-noisy.png" alt="Sample objects from the COIL noisy database" /> <img src="./graphics/results-coil-noisy.png" />
+<figcaption>
+Sample objects from and results obtained on the COIL-100 noisy database (from Smach <em>et al.</em>).
+</figcaption>
+</figure>
+</section><section id="other-experimental-results" class="slide level2">
+<h1>Other experimental results</h1>
+<figure>
+<img src="./graphics/faces.png" /> <img src="./graphics/results-faces.png" />
+<figcaption>
+Sample objects from and results obtained on the faces ORL database (from Smach <em>et al.</em>).
+</figcaption>
+</figure>
+</section><section id="texture-recognition" class="slide level2">
+<h1>Texture recognition</h1>
+<p>Let <span class="math">\(E\subset \widehat{\mathbb R^2}\)</span> be countable and invariant under the action of <span class="math">\(\mathbb Z_N\)</span>.</p>
+<p>A natural model for texture discrimination are almost periodic functions on <span class="math">\(SE(2,N)\)</span> in the <span class="math">\(B_2\)</span> Besicovitch class, i.e., <span class="math">\[
+  f(x,k) = \sum_{\substack{\lambda\in E \\ n\in\mathbb Z_N}} a(\lambda,n) e^{i\langle R_n\lambda,x\rangle} \quad\text{s.t.}\quad \sum_{\substack{\lambda\in E \\ n\in\mathbb Z_N}} |a(\lambda,n)|^2&lt;+\infty.
+\]</span></p>
+<ul>
+<li><span class="math">\(B_2\)</span> functions are the pull-back of <span class="math">\(L^2\)</span> functions on the Bohr compactification.</li>
+<li>The theory above can be adapted to these spaces of functions, and an analog of the weakly completeness of rotational bispectral invariants holds.</li>
+<li>In this space the bispectral invariants are <strong>not</strong> complete, and thus the (analog of) the above conjecture is false.</li>
+<li>As already mentioned, when <span class="math">\(E\)</span> is finite this space can be used to exacty solve the hypoelliptic diffusion.</li>
+</ul>
+</section><section id="remark-setting" class="slide level2">
+<h1>Remark: Setting</h1>
+<p>The considerations of this part of the talk work in the general context of a semi-direct product <span class="math">\(\mathbb G = \mathbb H\rtimes \mathbb K\)</span> where</p>
+<ul>
+<li><span class="math">\(\mathbb H\)</span> is an abelian locally compact group</li>
+<li><span class="math">\(\mathbb K\)</span> is a finite group</li>
+<li>the Haar measure on <span class="math">\(\mathbb H\)</span> is invariant under the action <span class="math">\(R:\mathbb K\to \text{Aut }\mathbb H\)</span>,</li>
+<li>the natural action of <span class="math">\(\mathbb K\)</span> on the dual <span class="math">\(\widehat {\mathbb H}\)</span> has non-trivial stabilizer only w.r.t. the identity <span class="math">\(\hat o\in\widehat {\mathbb H}\)</span>.</li>
+</ul>
+<p>The group law on <span class="math">\(\mathbb G\)</span> is <em>non-commutative</em>: <span class="math">\[
+    (x,k)(y,h) = (x+R_k y, k+h).
+\]</span></p>
+<p>In our case: <span class="math">\(\mathbb H= \mathbb R^2\)</span>, <span class="math">\(\mathbb K=\mathbb Z_N\)</span> and <span class="math">\(R_k\)</span> is the rotation of <span class="math">\(2\pi k/N\)</span>.</p>
+</section></section>
+<section><section id="thank-you-for-your-attention" class="titleslide slide level1"><h1>Thank you for your attention</h1></section></section>
+			</div>
+		</div>
+
+		<script src="reveal.js/lib/js/head.min.js"></script>
+		<script src="reveal.js/js/reveal.js"></script>
+
+		<script>
+			// More info about config & dependencies:
+			// - https://github.com/hakimel/reveal.js#configuration
+			// - https://github.com/hakimel/reveal.js#dependencies
+			Reveal.initialize({
+			    // theme: 'sky', // available themes are in /css/theme
+			    // transition: 'linear', // default/cube/page/concave/zoom/linear/fade/none
+
+	            // The "normal" size of the presentation, aspect ratio will be preserved
+				// // when the presentation is scaled to fit different resolutions. Can be
+				// // specified using percentage units.
+				// width: 960,
+				// height: 700,
+
+				// // Factor of the display size that should remain empty around the content
+				// margin: 0.1,
+
+				// // Bounds for smallest/largest possible scale to apply to content
+				// minScale: 0.2,
+				// maxScale: 1.5
+
+
+				dependencies: [
+					{ src: 'reveal.js/plugin/markdown/marked.js' },
+					{ src: 'reveal.js/plugin/markdown/markdown.js' },
+					{ src: 'reveal.js/plugin/notes/notes.js', async: true },
+					{ src: 'reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+				]
+			});
+		</script>
+	</body>
+</html>
